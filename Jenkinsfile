@@ -14,7 +14,7 @@ pipeline {
             agent {
                 docker {
                     image 'maven:3.9-eclipse-temurin-21'
-                    args '--network host'   // DNS: usa la red de jenkins-docker
+                    args '-e TZ=America/Bogota --network host'   // DNS: usa la red de jenkins-docker
                 }
             }
             environment { HOME = "${env.WORKSPACE}" }
@@ -37,7 +37,7 @@ pipeline {
             agent any
             steps {
                 sh '''
-                    docker run -d --name $CONTENEDOR -p 18000:8000 $IMAGEN
+                    docker run -d --name $CONTENEDOR -e TZ=America/Bogota -p 18000:8000 $IMAGEN
                     for i in $(seq 1 15); do
                         curl -fs http://docker:18000/health && exit 0
                         sleep 2
@@ -59,7 +59,7 @@ pipeline {
                 sh '''
                     # Reemplazar la versión en ejecución por la nueva
                     docker rm -f taller-app || true
-                    docker run -d --name taller-app --restart unless-stopped -p 8000:8000 $IMAGEN
+                    docker run -d --name taller-app --restart unless-stopped -e TZ=America/Bogota -p 8000:8000 $IMAGEN
 
                     # Verificar que la versión desplegada responde
                     for i in $(seq 1 15); do
